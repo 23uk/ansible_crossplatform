@@ -1,0 +1,10 @@
+<VirtualHost *:80>
+ ServerName site1.ru
+ ServerAlias www.site1.ru
+ DocumentRoot /home
+ <Directory /home>
+ Options FollowSymLinks
+ AllowOverride All
+ Require all granted
+ </Directory>
+</VirtualHost>

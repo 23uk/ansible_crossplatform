@@ -1,0 +1,38 @@
+---
+- name: Install Nginx
+  hosts: all
+  become: yes
+  
+  vars:
+    nginx_folder_local: ./nginx
+    nginx_log_folder_remote: /var/log/nginx
+    virtual_hosts_folder_local: ./nginx/conf.d
+    nginx_config_remote: /etc/nginx
+    virtual_hosts_folder_remote: /etc/nginx/conf.d
+
+  tasks:
+  - name: Install epel-release
+    yum: name=epel-release state=latest 
+
+  - name: Install Nginx
+    yum: name=nginx state=latest 
+
+  - name: Autostart webserver
+    service: name=nginx state=started enabled=yes
+
+  - name: Generate nginx.conf
+    template: src={{ nginx_folder_local }}/nginx.j2 dest={{ nginx_config_remote }}/nginx.conf mode=0644
+    notify: Reload nginx
+
+  - name: Generate virtual_host1
+    template: src={{ virtual_hosts_folder_local }}/host1.j2 dest={{ virtual_hosts_folder_remote }}/host1.conf mode=0644
+    notify: Restart nginx
+
+  - name: Generate virtual_host2
+    template: src={{ virtual_hosts_folder_local }}/host2.j2 dest={{ virtual_hosts_folder_remote }}/host2.conf mode=0644
+    notify: Restart nginx
+
+  handlers:
+  - name: Reload nginx
+    service: name=nginx state=reloaded
+

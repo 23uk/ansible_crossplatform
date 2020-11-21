@@ -1,0 +1,26 @@
+---
+- name: Install Nginx
+  hosts: all
+  become: yes
+  
+  vars:
+    filename: ./nginx.conf
+    destin_file: /etc/nginx
+
+  tasks:
+  - name: Install epel-release
+    yum: name=epel-release state=latest 
+
+  - name: Install Nginx
+    yum: name=nginx state=latest 
+
+  - name: Autostart webserver
+    service: name=nginx state=started enabled=yes
+
+  - name: Copy nginx.conf
+    copy: src={{ filename }} dest={{ destin_file }} mode=644
+    notify: Restart nginx
+
+  handlers:
+  - name: Restart nginx
+    service: name=nginx state=restarted
