@@ -1,0 +1,26 @@
+---
+# tasks file for nginx-settings
+
+- name: Install epel-release
+  yum: name=epel-release state=latest
+
+- name: Install Nginx
+  yum: name=nginx state=latest
+
+- name: Autostart webserver
+  service: name=nginx state=started enabled=yes
+
+- name: Generate nginx.conf
+  template: src=nginx.j2 dest={{ nginx_config_remote }}/nginx.conf mode=0644
+  notify: Reload nginx
+
+- name: Generate virtual_host1
+  template: src=conf.d/host1.j2 dest={{ virtual_hosts_folder_remote }}/host1.conf mode=0644
+  notify: Reload nginx
+
+- name: Generate virtual_host2
+  template: src=conf.d/host2.j2 dest={{ virtual_hosts_folder_remote }}/host2.conf mode=0644
+  notify: Reload nginx
+
+- name: Generate title page
+  template: src=index.j2 dest={{ site_folder_remote }}/index.html mode=0644
