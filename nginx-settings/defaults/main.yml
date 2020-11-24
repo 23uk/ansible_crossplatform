@@ -5,3 +5,5 @@ nginx_log_folder_remote: /var/log/nginx
 nginx_config_remote: /etc/nginx
 virtual_hosts_folder_remote: /etc/nginx/conf.d
 site_folder_remote: /home
+domain_name: 23uk.devops.rebrain.srwx.net
+letsencrypt_email: 23uk@tut.by
