@@ -1,10 +1,24 @@
-<VirtualHost *:80>
- ServerName site2.ru
- ServerAlias www.site2.ru
- DocumentRoot /home
- <Directory /home>
- Options FollowSymLinks
- AllowOverride All
- Require all granted
- </Directory>
-</VirtualHost>
+server {
+	listen       80;
+	server_name  site2.ru;
+	root /home;
+	index index.php index.html;
+
+	location / {
+                client_max_body_size    64m;
+                client_body_buffer_size 128k;
+               proxy_send_timeout   90;
+                proxy_read_timeout   120;
+                proxy_buffer_size    32k;
+                proxy_buffers     16 32k;
+                proxy_busy_buffers_size 64k;
+                proxy_temp_file_write_size 64k;
+                proxy_connect_timeout 30s;
+
+                proxy_pass   http://127.0.0.1:8080;
+
+                proxy_set_header   Host   $host;
+                proxy_set_header   X-Real-IP  $remote_addr;
+                proxy_set_header   X-Forwarded-For $proxy_add_x_forwarded_for;
+        }
+}

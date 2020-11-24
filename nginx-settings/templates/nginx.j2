@@ -9,7 +9,6 @@ pid /run/nginx.pid;
 
 # Load dynamic modules. See /usr/share/doc/nginx/README.dynamic.
 include /usr/share/nginx/modules/*.conf;
-include {{ virtual_hosts_folder_remote }}/*.conf;
 
 events {
     worker_connections 1024;
@@ -34,7 +33,7 @@ http {
     # Load modular configuration files from the /etc/nginx/conf.d directory.
     # See http://nginx.org/en/docs/ngx_core_module.html#include
     # for more information.
-    include /etc/nginx/conf.d/*.conf;
+    include {{ virtual_hosts_folder_remote }}/*.conf;
 
     server {
         listen       80 default_server;
