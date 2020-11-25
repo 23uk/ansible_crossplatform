@@ -12,7 +12,7 @@ data "hcloud_server" "serverinfo" {
 }
 
 resource "hcloud_server" "devops_23uk" {
-  image    = "centos-7"
+  image    = "debian-9"
   name     = "devops-23uk"
   server_type = "cx11"
   labels = {

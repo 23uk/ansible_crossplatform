@@ -1,47 +1,33 @@
 ---
 # tasks file for nginx-settings
 
-- name: Install epel-release
-  yum: name=epel-release state=latest
+- name: Check Linux distibutive
+  debug: var=ansible_os_family
 
-- name: Create site folder
-  file: path=/home/{{ domain_name }} state=directory
+- block: # =======Block for Ubuntu=======
 
-- name: Install Nginx
-  yum: name=nginx state=latest
+  - name: Update package list
+    apt: cache_valid_time=3600 update_cache=yes
 
-- name: Autostart webserver
-  service: name=nginx state=started enabled=yes
+  - name: Install Nginx
+    apt: name=nginx state=latest
 
-- name: Generate HTTP nginx.conf
-  template: src=nginx.j2 dest={{ nginx_config_remote }}/nginx.conf mode=0644
-  notify: Reload nginx
+  - name: Autostart webserver
+    service: name=nginx state=started enabled=yes
 
-- name: Generate virtual_host HTTP
-  template: src=conf.d/host1.j2 dest={{ virtual_hosts_folder_remote }}/{{ domain_name }}.conf mode=0644
-  notify: Reload nginx
+  when: ansible_os_family == "Debian"
 
-- name: Generate title page
-  template: src=index.j2 dest={{ site_folder_remote }}/{{ domain_name }}/index.html mode=0644
 
-- name: Install certbot
-  yum: name=certbot state=present
+- block: # =======Block for Redhat=======
 
-- name: Create LE folder
-  file: path=/etc/letsencrypt state=directory
+  - name: Install epel-release
+    yum: name=epel-release state=latest
+ 
+  - name: Install Nginx
+    yum: name=nginx state=latest
 
-- name: Create letsencrypt certificate
-  shell: certbot certonly -n --webroot -w /home/{{ domain_name }} -m {{ letsencrypt_email }} -d {{ domain_name }}
-  args:
-    creates: /etc/letsencrypt/live/{{ domain_name }}
+  - name: Autostart webserver
+    service: name=nginx state=started enabled=yes
 
-- name: Generate virtual_host HTTPS
-  template: src=conf.d/host2.j2 dest={{ virtual_hosts_folder_remote }}/{{ domain_name }}.conf mode=0644
-  notify: Reload nginx
-
-- name: Add letsencrypt cronjob for cert renewal
-  cron:
-    name: letsencrypt_renewal
-    special_time: weekly
-    job: certbot --renew certonly -n --webroot -w /home/{{ domain_name }} -m {{ letsencrypt_email }} -d {{ domain_name }} && service nginx reload
+  when: ansible_os_family == "RedHat"
 
